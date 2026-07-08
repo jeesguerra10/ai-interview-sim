@@ -1,10 +1,7 @@
+import LandingPage from "./pages/LandingPage";
+
 function App() {
-  return (
-    <main>
-      <h1>AI Interview Simulator</h1>
-      <p>Your AI powered interview preparation platform.</p>
-    </main>
-  );
+  return <LandingPage />;
 }
 
 export default App;
