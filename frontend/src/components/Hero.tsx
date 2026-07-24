@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Hero() {
   return (
     <section className="mx-auto mt-24 max-w-4xl px-8 text-center">
@@ -10,9 +12,12 @@ function Hero() {
         instant AI feedback to improve your confidence.
       </p>
 
-      <button className="mt-8 rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700">
+      <Link
+        to="/login"
+        className="mt-8 inline-block rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+      >
         Get Started
-      </button>
+      </Link>
     </section>
   );
 }
