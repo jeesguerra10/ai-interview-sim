@@ -6,16 +6,16 @@ import RecentActivity from "../components/RecentActivity";
 
 function DashboardPage() {
   return (
-    <main className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <DashboardNavbar />
 
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <main className="mx-auto max-w-6xl px-6 py-10">
         <WelcomeSection />
         <QuickActions />
         <StatsSection />
         <RecentActivity />
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
