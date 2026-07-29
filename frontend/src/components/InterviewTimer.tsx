@@ -1,18 +1,8 @@
-import { useEffect, useState } from "react";
+type InterviewTimerProps = {
+  seconds: number;
+};
 
-function InterviewTimer() {
-  const [seconds, setSeconds] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSeconds((previousSeconds) => previousSeconds + 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
+function InterviewTimer({ seconds }: InterviewTimerProps) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
 

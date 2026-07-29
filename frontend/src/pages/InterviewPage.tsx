@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InterviewHeader from "../components/InterviewHeader";
 import QuestionCard from "../components/QuestionCard";
@@ -24,6 +24,18 @@ function InterviewPage() {
     Array(questions.length).fill("")
   );
 
+  const [seconds, setSeconds] = useState(0);
+
+    useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds((previousSeconds) => previousSeconds + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   const currentAnswerWordCount = answers[currentQuestion].trim()
     ? answers[currentQuestion].trim().split(/\s+/).length
     : 0;
@@ -46,6 +58,7 @@ function InterviewPage() {
           state: {
             questions,
             answers,
+            seconds,
           },
         });
     }
@@ -65,7 +78,7 @@ function InterviewPage() {
           totalQuestions={questions.length}
         />
 
-        <InterviewTimer />
+        <InterviewTimer seconds={seconds} />
 
         <ProgressBar
           currentQuestion={currentQuestion + 1}

@@ -3,10 +3,14 @@ import { useLocation } from "react-router-dom";
 function ResultsPage() {
   const location = useLocation();
 
-  const { questions, answers } = location.state || {
+  const { questions, answers, seconds = 0} = location.state || {
     questions: [],
     answers: [],
+    seconds: 0,
   };
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -14,6 +18,11 @@ function ResultsPage() {
         <h1 className="mb-8 text-4xl font-bold">
           Interview Results
         </h1>
+
+        <p className="mb-8 mt-2 text-gray-600">
+          Completed in {minutes}:
+          {remainingSeconds.toString().padStart(2, "0")}
+        </p>
 
         {questions.map((question: string, index: number) => (
           <section
