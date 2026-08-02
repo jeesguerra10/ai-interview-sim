@@ -4,6 +4,7 @@ type InterviewControlsProps = {
   isFirstQuestion: boolean;
   isLastQuestion: boolean;
   canContinue: boolean;
+  isSubmitting: boolean;
 };
 
 function InterviewControls({
@@ -12,13 +13,14 @@ function InterviewControls({
   isFirstQuestion,
   isLastQuestion,
   canContinue,
+  isSubmitting,
 }: InterviewControlsProps) {
   return (
     <section className="flex items-center justify-between">
       <button
         type="button"
         onClick={onPrevious}
-        disabled={isFirstQuestion}
+        disabled={isFirstQuestion || isSubmitting}
         className="rounded-lg border border-gray-300 px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Previous
@@ -27,10 +29,14 @@ function InterviewControls({
       <button
         type="button"
         onClick={onNext}
-        disabled={!canContinue}
+        disabled={!canContinue || isSubmitting}
         className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isLastQuestion ? "Finish Interview" : "Next Question"}
+        {isSubmitting
+          ? "Saving..."
+          : isLastQuestion
+          ? "Finish Interview"
+          : "Next Question"}
       </button>
     </section>
   );

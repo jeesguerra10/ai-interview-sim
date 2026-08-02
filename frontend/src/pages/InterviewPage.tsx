@@ -6,6 +6,8 @@ import AnswerBox from "../components/AnswerBox";
 import InterviewControls from "../components/InterviewControls";
 import ProgressBar from "../components/ProgressBar";
 import InterviewTimer from "../components/InterviewTimer";
+import { auth } from "../services/firebase";
+import { saveInterview } from "../services/interviewService";
 
 const questions = [
   "Tell me about yourself and your experience with React.",
@@ -25,6 +27,8 @@ function InterviewPage() {
   );
 
   const [seconds, setSeconds] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
     useEffect(() => {
     const timer = setInterval(() => {
@@ -50,17 +54,57 @@ function InterviewPage() {
     setAnswers(updatedAnswers);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-        navigate("/results", {
-          state: {
-            questions,
-            answers,
-            seconds,
-          },
-        });
+      setCurrentQuestion(
+        (previousQuestion) => previousQuestion + 1
+      );
+
+      return;
+    }
+
+    const user = auth.currentUser;
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setSaveError("");
+
+      const overallScore = 82;
+
+      const interviewId = await saveInterview({
+        userId: user.uid,
+        role: "Frontend Developer",
+        questions,
+        answers,
+        durationSeconds: seconds,
+        overallScore,
+      });
+
+      navigate("/results", {
+        state: {
+          interviewId,
+          questions,
+          answers,
+          seconds,
+          overallScore,
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Unable to save interview:",
+        error
+      );
+
+      setSaveError(
+        "Your interview could not be saved. Please try again."
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -92,12 +136,19 @@ function InterviewPage() {
           onAnswerChange={handleAnswerChange} 
         />
 
+        {saveError && (
+          <p 
+            className="mb-4 text-sm text-red-600"> {saveError}
+          </p>
+        )}
+
         <InterviewControls
           onPrevious={handlePreviousQuestion}
           onNext={handleNextQuestion}
           isFirstQuestion={currentQuestion === 0}
           isLastQuestion={currentQuestion === questions.length - 1}
           canContinue={isCurrentAnswerValid}
+          isSubmitting={saving}
         />
       </main>
     </div>
