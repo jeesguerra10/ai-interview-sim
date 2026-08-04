@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+
 import { auth } from "../services/firebase";
 
 function RegisterPage() {
   const navigate = useNavigate();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,6 +25,11 @@ function RegisterPage() {
 
     setError("");
 
+    if (name.trim() === "") {
+      setError("Name is required.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -33,15 +43,20 @@ function RegisterPage() {
     try {
       setLoading(true);
 
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential =
+        await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+      await updateProfile(userCredential.user, {
+        displayName: name.trim(),
+      });
 
       navigate("/dashboard");
     } catch (error) {
-      console.error(error);
+      console.error("Unable to create account:", error);
       setError("Unable to create account. Please try again.");
     } finally {
       setLoading(false);
@@ -63,6 +78,26 @@ function RegisterPage() {
           onSubmit={handleRegister}
           className="mt-8 space-y-5"
         >
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Name
+            </label>
+
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(event) =>
+                setName(event.target.value)
+              }
+              required
+              className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+            />
+          </div>
+
           <div>
             <label
               htmlFor="email"
@@ -134,7 +169,9 @@ function RegisterPage() {
             disabled={loading}
             className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Creating account..." : "Create account"}
+            {loading
+              ? "Creating account..."
+              : "Create account"}
           </button>
         </form>
 

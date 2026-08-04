@@ -5,6 +5,7 @@ import WelcomeSection from "../components/WelcomeSection";
 import QuickActions from "../components/QuickActions";
 import StatsSection from "../components/StatsSection";
 import RecentActivity from "../components/RecentActivity";
+import ProfileCard from "../components/ProfileCard";
 
 import { auth } from "../services/firebase";
 import {
@@ -47,6 +48,7 @@ function DashboardPage() {
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         <WelcomeSection />
+        <ProfileCard interviews={interviews} />
         <QuickActions />
 
         {loading && (
