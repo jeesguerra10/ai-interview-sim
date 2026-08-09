@@ -1,11 +1,15 @@
 type InterviewHeaderProps = {
   currentQuestion: number;
   totalQuestions: number;
+  role: string;
+  difficulty: string;
 };
 
 function InterviewHeader({
   currentQuestion,
   totalQuestions,
+  role,
+  difficulty,
 }: InterviewHeaderProps) {
   return (
     <header className="mb-8">
@@ -14,11 +18,13 @@ function InterviewHeader({
       </p>
 
       <h1 className="mt-2 text-3xl font-bold text-gray-900">
-        Frontend Developer Interview
+        {role} Interview
       </h1>
 
       <p className="mt-2 text-gray-600">
-        Question {currentQuestion} of {totalQuestions}
+        {difficulty} level . Question{" "}
+        {currentQuestion} of{" "}
+        {totalQuestions}
       </p>
     </header>
   );
