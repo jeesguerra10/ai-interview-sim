@@ -1,58 +1,100 @@
-import { useLocation } from "react-router-dom";
-import ResultSummary from "../components/ResultSummary";
+import {
+  useLocation,
+} from "react-router-dom";
+
 import FeedbackList from "../components/FeedbackList";
 import QuestionFeedbackCard from "../components/QuestionFeedbackCard";
 import ResultActions from "../components/ResultActions";
+import ResultSummary from "../components/ResultSummary";
+
+import type {
+  QuestionFeedback,
+} from "../services/aiService";
+
+type ResultsState = {
+  interviewId: string;
+  role: string;
+  difficulty: string;
+  questions: string[];
+  answers: string[];
+  seconds: number;
+  overallScore: number;
+  strengths: string[];
+  improvements: string[];
+  questionFeedback: QuestionFeedback[];
+};
 
 function ResultsPage() {
   const location = useLocation();
 
-  const { questions, answers, seconds = 0} = location.state || {
-    questions: [],
-    answers: [],
-    seconds: 0,
-  };
+  const results =
+    location.state as ResultsState | null;
 
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
+  const questions =
+    results?.questions || [];
 
-  const completedTime = `${minutes}:${remainingSeconds
-  .toString()
-  .padStart(2, "0")}`;
+  const answers =
+    results?.answers || [];
 
-  const strengths = [
-  "You gave clear and understandable answers.",
-  "You provided relevant examples from your experience.",
-  "Your answers showed confidence and good communication.",
-  ];
+  const seconds =
+    results?.seconds || 0;
 
-  const improvements = [
-  "Use the STAR method to structure your answers.",
-  "Include more detail about the results of your actions.",
-  "Connect your experience more directly to the role.",
-  ];
+  const overallScore =
+    results?.overallScore || 0;
 
-  const questionScores = [80, 85, 78, 88, 82];
+  const strengths =
+    results?.strengths || [];
 
-  const questionFeedback = [
-    "Good introduction. Add one specific example of a React project you have worked on.",
-    "Your motivation is clear. Connect it more directly to the company and role.",
-    "You explained the problem well. Include more detail about the result.",
-    "Strong answer. Add one accessibility example such as keyboard navigation or semantic HTML.",
-    "Good career direction. Make the goal more specific and explain how you plan to achieve it.",
-  ];
+  const improvements =
+    results?.improvements || [];
+
+  const questionFeedback =
+    results?.questionFeedback || [];
+
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const remainingSeconds =
+    seconds % 60;
+
+  const completedTime =
+    `${minutes}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
+
+  if (!results) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">
+            No interview results found
+          </h1>
+
+          <p className="mt-2 text-gray-600">
+            Complete an interview to see your results.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="mx-auto max-w-4xl px-6 py-10">
-        <h1 className="mb-8 text-4xl font-bold text-gray-900">
+        <h1 className="text-4xl font-bold text-gray-900">
           Interview Results
         </h1>
 
-        <ResultSummary
-          score={82}
-          completedTime={completedTime}
-        />
+        <p className="mt-2 text-gray-600">
+          {results.role} · {results.difficulty} level
+        </p>
+
+        <div className="mt-8">
+          <ResultSummary
+            score={overallScore}
+            completedTime={completedTime}
+          />
+        </div>
 
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
           <FeedbackList
@@ -70,19 +112,37 @@ function ResultsPage() {
           Question Feedback
         </h2>
 
-        {questions.map((question: string, index: number) => (
-          <QuestionFeedbackCard
-            key={index}
-            questionNumber={index + 1}
-            question={question}
-            answer={answers[index]}
-            score={questionScores[index]}
-            feedback={questionFeedback[index]}
-          />
-        ))}
+        {questions.map(
+          (
+            question: string,
+            index: number
+          ) => {
+            const feedback =
+              questionFeedback[index];
+
+            return (
+              <QuestionFeedbackCard
+                key={index}
+                questionNumber={
+                  index + 1
+                }
+                question={question}
+                answer={
+                  answers[index] || ""
+                }
+                score={
+                  feedback?.score || 0
+                }
+                feedback={
+                  feedback?.feedback ||
+                  "Feedback unavailable."
+                }
+              />
+            );
+          }
+        )}
 
         <ResultActions />
-
       </main>
     </div>
   );

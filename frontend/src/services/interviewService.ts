@@ -9,33 +9,46 @@ import {
 } from "firebase/firestore";
 
 import { db } from "./firebase";
+import type { QuestionFeedback } from "./aiService";
 
 type SaveInterviewData = {
   userId: string;
   role: string;
+  difficulty: string;
   questions: string[];
   answers: string[];
   durationSeconds: number;
   overallScore: number;
+  strengths: string[];
+  improvements: string[];
+  questionFeedback: QuestionFeedback[];
 };
 
 export type InterviewRecord = {
   id: string;
   role: string;
+  difficulty?: string;
   questions: string[];
   answers: string[];
   durationSeconds: number;
   overallScore: number;
+  strengths?: string[];
+  improvements?: string[];
+  questionFeedback?: QuestionFeedback[];
   createdAt: Timestamp | null;
 };
 
 export async function saveInterview({
   userId,
   role,
+  difficulty,
   questions,
   answers,
   durationSeconds,
   overallScore,
+  strengths,
+  improvements,
+  questionFeedback,
 }: SaveInterviewData) {
   const interviewsCollection = collection(
     db,
@@ -48,10 +61,14 @@ export async function saveInterview({
     interviewsCollection,
     {
       role,
+      difficulty,
       questions,
       answers,
       durationSeconds,
       overallScore,
+      strengths,
+      improvements,
+      questionFeedback,
       createdAt: serverTimestamp(),
     }
   );
@@ -82,10 +99,14 @@ export async function getUserInterviews(
     return {
       id: document.id,
       role: data.role,
+      difficulty: data.difficulty,
       questions: data.questions,
       answers: data.answers,
       durationSeconds: data.durationSeconds,
       overallScore: data.overallScore,
+      strengths: data.strengths,
+      improvements: data.improvements,
+      questionFeedback: data.questionFeedback,
       createdAt: data.createdAt ?? null,
     };
   });

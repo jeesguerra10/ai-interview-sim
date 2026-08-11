@@ -16,6 +16,11 @@ import ProgressBar from "../components/ProgressBar";
 import QuestionCard from "../components/QuestionCard";
 
 import { auth } from "../services/firebase";
+
+import {
+  generateInterviewFeedback,
+} from "../services/aiService";
+
 import { saveInterview } from "../services/interviewService";
 
 type InterviewSetup = {
@@ -63,10 +68,10 @@ function InterviewPage() {
 
   const [seconds, setSeconds] = useState(0);
 
-  const [saving, setSaving] =
+  const [submitting, setSubmitting] =
     useState(false);
 
-  const [saveError, setSaveError] =
+  const [submitError, setSubmitError] =
     useState("");
 
   useEffect(() => {
@@ -136,43 +141,64 @@ function InterviewPage() {
     }
 
     try {
-      setSaving(true);
-      setSaveError("");
+      setSubmitting(true);
+      setSubmitError("");
 
-      const overallScore = 82;
+      const feedback =
+        await generateInterviewFeedback({
+          role,
+          difficulty,
+          questions,
+          answers,
+        });
 
       const interviewId =
         await saveInterview({
           userId: user.uid,
           role,
+          difficulty,
           questions,
           answers,
           durationSeconds: seconds,
-          overallScore,
+          overallScore:
+            feedback.overallScore,
+          strengths:
+            feedback.strengths,
+          improvements:
+            feedback.improvements,
+          questionFeedback:
+            feedback.questionFeedback,
         });
 
       navigate("/results", {
         state: {
           interviewId,
+          role,
+          difficulty,
           questions,
           answers,
           seconds,
-          overallScore,
-          role,
-          difficulty,
+          overallScore:
+            feedback.overallScore,
+          strengths:
+            feedback.strengths,
+          improvements:
+            feedback.improvements,
+          questionFeedback:
+            feedback.questionFeedback,
         },
       });
     } catch (error) {
       console.error(
-        "Unable to save interview:",
+        "Unable to complete interview:",
         error
       );
 
-      setSaveError(
-        "Your interview could not be saved. Please try again."
+      setSubmitError(
+        "Your interview could not be analysed. Please try again."
       );
     } finally {
-      setSaving(false);
+      setSubmitting(false);
     }
   };
 
@@ -216,9 +242,9 @@ function InterviewPage() {
           }
         />
 
-        {saveError && (
+        {submitError && (
           <p className="mb-4 text-sm text-red-600">
-            {saveError}
+            {submitError}
           </p>
         )}
 
@@ -237,7 +263,7 @@ function InterviewPage() {
           canContinue={
             isCurrentAnswerValid
           }
-          isSubmitting={saving}
+          isSubmitting={submitting}
         />
       </main>
     </div>
