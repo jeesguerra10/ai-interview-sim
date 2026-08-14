@@ -17,6 +17,7 @@ function App() {
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/interview" element={<ProtectedRoute><InterviewPage /></ProtectedRoute>} />
       <Route path="/results" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
+      <Route path="/results/:interviewId" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/upload-cv" element={<ProtectedRoute><UploadCVPage /></ProtectedRoute>} />

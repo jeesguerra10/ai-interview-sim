@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import type { InterviewRecord } from "../services/interviewService";
 
 type RecentActivityProps = {
@@ -35,24 +37,33 @@ function RecentActivity({
               : "Date unavailable";
 
             return (
-              <article
+              <Link
+                to={`/results/${interview.id}`}
                 key={interview.id}
-                className="flex flex-col gap-3 border-b border-gray-200 p-5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
+                className="block border-b border-gray-200 p-5 transition hover:bg-gray-50 last:border-b-0"
               >
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {interview.role}
-                  </h3>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {interview.role}
+                    </h3>
 
-                  <p className="mt-1 text-sm text-gray-600">
-                    {interviewDate}
-                  </p>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {interviewDate}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <p className="font-semibold text-blue-600">
+                      Score: {interview.overallScore}%
+                    </p>
+
+                    <span className="text-sm text-gray-500">
+                      View results
+                    </span>
+                  </div>
                 </div>
-
-                <p className="font-semibold text-blue-600">
-                  Score: {interview.overallScore}%
-                </p>
-              </article>
+              </Link>
             );
           })}
         </div>

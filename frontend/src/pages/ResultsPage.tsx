@@ -1,11 +1,18 @@
-import {
-  useLocation,
-} from "react-router-dom";
+import {useEffect, useState} from "react";
+
+import {useLocation,useParams} from "react-router-dom";
 
 import FeedbackList from "../components/FeedbackList";
 import QuestionFeedbackCard from "../components/QuestionFeedbackCard";
 import ResultActions from "../components/ResultActions";
 import ResultSummary from "../components/ResultSummary";
+
+import { auth } from "../services/firebase";
+
+import {
+  getInterviewById,
+  type InterviewRecord,
+} from "../services/interviewService";
 
 import type {
   QuestionFeedback,
@@ -26,43 +33,144 @@ type ResultsState = {
 
 function ResultsPage() {
   const location = useLocation();
+  const { interviewId } = useParams();
 
-  const results =
+  const freshResults =
     location.state as ResultsState | null;
 
+  const [savedResult, setSavedResult] =
+    useState<InterviewRecord | null>(null);
+
+  const [loading, setLoading] =
+    useState(Boolean(interviewId && !freshResults));
+
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadSavedInterview = async () => {
+      if (!interviewId || freshResults) {
+        return;
+      }
+
+      const user = auth.currentUser;
+
+      if (!user) {
+        setError(
+          "You must be signed in to view this interview."
+        );
+
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const interview =
+          await getInterviewById(
+            user.uid,
+            interviewId
+          );
+
+        if (!interview) {
+          setError(
+            "This interview could not be found."
+          );
+
+          return;
+        }
+
+        setSavedResult(interview);
+      } catch (error) {
+        console.error(
+          "Unable to load saved interview:",
+          error
+        );
+
+        setError(
+          "Your saved interview could not be loaded."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSavedInterview();
+  }, [interviewId, freshResults]);
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gray-50">
+        <p className="text-gray-600">
+          Loading interview results...
+        </p>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Unable to load results
+          </h1>
+
+          <p className="mt-2 text-gray-600">
+            {error}
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  const role =
+    freshResults?.role ||
+    savedResult?.role ||
+    "Interview";
+
+  const difficulty =
+    freshResults?.difficulty ||
+    savedResult?.difficulty ||
+    "Intermediate";
+
   const questions =
-    results?.questions || [];
+    freshResults?.questions ||
+    savedResult?.questions ||
+    [];
 
   const answers =
-    results?.answers || [];
+    freshResults?.answers ||
+    savedResult?.answers ||
+    [];
 
   const seconds =
-    results?.seconds || 0;
+    freshResults?.seconds ??
+    savedResult?.durationSeconds ??
+    0;
 
   const overallScore =
-    results?.overallScore || 0;
+    freshResults?.overallScore ??
+    savedResult?.overallScore ??
+    0;
 
   const strengths =
-    results?.strengths || [];
+    freshResults?.strengths ||
+    savedResult?.strengths ||
+    [];
 
   const improvements =
-    results?.improvements || [];
+    freshResults?.improvements ||
+    savedResult?.improvements ||
+    [];
 
   const questionFeedback =
-    results?.questionFeedback || [];
+    freshResults?.questionFeedback ||
+    savedResult?.questionFeedback ||
+    [];
 
-  const minutes =
-    Math.floor(seconds / 60);
-
-  const remainingSeconds =
-    seconds % 60;
-
-  const completedTime =
-    `${minutes}:${remainingSeconds
-      .toString()
-      .padStart(2, "0")}`;
-
-  if (!results) {
+  if (
+    !freshResults &&
+    !savedResult
+  ) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
         <div className="text-center">
@@ -78,6 +186,17 @@ function ResultsPage() {
     );
   }
 
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const remainingSeconds =
+    seconds % 60;
+
+  const completedTime =
+    `${minutes}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="mx-auto max-w-4xl px-6 py-10">
@@ -86,7 +205,7 @@ function ResultsPage() {
         </h1>
 
         <p className="mt-2 text-gray-600">
-          {results.role} · {results.difficulty} level
+          {role} · {difficulty} level
         </p>
 
         <div className="mt-8">

@@ -1,6 +1,8 @@
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
@@ -110,4 +112,39 @@ export async function getUserInterviews(
       createdAt: data.createdAt ?? null,
     };
   });
+}
+
+export async function getInterviewById(
+  userId: string,
+  interviewId: string
+): Promise<InterviewRecord | null> {
+  const interviewReference = doc(
+    db,
+    "users",
+    userId,
+    "interviews",
+    interviewId
+  );
+
+  const snapshot = await getDoc(interviewReference);
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  const data = snapshot.data();
+
+  return {
+    id: snapshot.id,
+    role: data.role,
+    difficulty: data.difficulty,
+    questions: data.questions,
+    answers: data.answers,
+    durationSeconds: data.durationSeconds,
+    overallScore: data.overallScore,
+    strengths: data.strengths,
+    improvements: data.improvements,
+    questionFeedback: data.questionFeedback,
+    createdAt: data.createdAt ?? null,
+  };
 }
