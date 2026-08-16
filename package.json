@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "firebase": "^12.16.0",
-    "pdfjs-dist": "^6.2.108"
-  }
-}
