@@ -1,3 +1,5 @@
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+
 type GenerateQuestionsRequest = {
   cvText: string;
   role: string;
@@ -33,7 +35,7 @@ export async function generateInterviewQuestions({
   difficulty,
 }: GenerateQuestionsRequest): Promise<string[]> {
   const response = await fetch(
-    "http://localhost:3001/api/generate-questions",
+    `${API_URL}/api/generate-questions`,
     {
       method: "POST",
       headers: {
@@ -66,7 +68,7 @@ export async function generateInterviewFeedback({
   answers,
 }: GenerateFeedbackRequest): Promise<InterviewFeedback> {
   const response = await fetch(
-    "http://localhost:3001/api/generate-feedback",
+    `${API_URL}/api/generate-feedback`,
     {
       method: "POST",
       headers: {

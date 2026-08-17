@@ -9,13 +9,13 @@ function Features() {
 
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         <FeatureCard
-          title="CV-Based Questions"
-          description="Upload your CV and get interview questions based on your real experience, skills, and projects."
+          title="CV Based Questions"
+          description="Upload your CV and get interview questions based on your real experience, skills and projects."
         />
 
         <FeatureCard
           title="AI Feedback"
-          description="Receive instant feedback on your answers, including technical depth, clarity, and confidence."
+          description="Receive instant feedback on your answers, including technical depth, clarity and confidence."
         />
 
         <FeatureCard
